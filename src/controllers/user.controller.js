@@ -6,7 +6,6 @@ const ApiResponse = require("../utils/ApiResponse");
 const catchAsync = require("../utils/CatchAsyn");
 
 const RegisterUser = catchAsync(async (req, res) => {
-  console.log("req.body", req.body);
   let user = await UserService.RegisterUser(req.body);
   ApiResponse(res, 201, `User is created Successfully !`, user);
 });
@@ -51,7 +50,7 @@ const ForgatePassword = catchAsync(async (req, res) => {
 });
 const ResetPassword = catchAsync(async (req, res) => {
   const token = req.query.token || req.params.token; // works for both
-  const user = await UserService.resetPassword(req.body, token);
+   await UserService.resetPassword(req.body, token);
   ApiResponse(res, 200, "Password changed successfully", null);
 });
 
@@ -67,5 +66,5 @@ module.exports = {
   LoginUser,
   ForgatePassword,
   ResetPassword,
-  GetProfile
+  GetProfile,
 };
