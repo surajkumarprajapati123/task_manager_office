@@ -8,16 +8,18 @@ const RegisterUser = async (userdata) => {
     throw new AppError("All fields are required", 401);
   }
 
-  if( phone.length === 10){
-    throw new AppError("Mobile Number should be 10 !", 401);
+  // ✅ Corrected phone number validation
+  if (phone.length !== 10) {
+    throw new AppError("Mobile number must be exactly 10 digits!", 401);
   }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     throw new AppError("Invalid email format", 401);
   }
 
   const invalidCharsRegex = /[\s_]/;
-  if ( invalidCharsRegex.test(password)) {
+  if (invalidCharsRegex.test(password)) {
     throw new AppError(
       "Username and password cannot contain spaces or underscores",
       401
@@ -28,15 +30,6 @@ const RegisterUser = async (userdata) => {
     throw new AppError("Password must be between 3 to 8 characters", 401);
   }
 
-  //   // Check role
-  //   if (role === "admin" || role == "manager") {
-  //     throw new AppError(
-  //       "You are not allowed to create users with this role",
-  //       401
-  //     );
-  //   }
-
-  // Check if user already exists with the same email
   const existingUserWithEmail = await UserModel.findOne({ email });
   if (existingUserWithEmail) {
     throw new AppError("User with this email already exists", 401);
@@ -48,9 +41,9 @@ const RegisterUser = async (userdata) => {
 };
 
 const Login = async (userData) => {
-  const { password, username, email } = userData;
+  const { password, email } = userData;
 
-  if (!email && !username) {
+  if (!email) {
     throw new AppError("Enter email or username", 401);
   }
   if (!password) {
