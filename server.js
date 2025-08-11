@@ -1,6 +1,7 @@
 const express = require("express");
 const routes = require("./src/routes");
 const dotenv = require("dotenv")
+const cors = require("cors")
 dotenv.config()
 // const ErrorHandler = require("./src/middleware/error-handler");
 const DatabaseConnection = require("./src/db/db");
@@ -8,8 +9,11 @@ const ErrorHandler = require("./src/middleware/errorHander");
 
 const app = express();
 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+app.use(cors())
 
 
 app.use("/api", routes);
