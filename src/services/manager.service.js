@@ -5,7 +5,10 @@ const createTaskByManager = async (taskData, managerId) => {
   const { title, description, assignedTo, priority, deadline } = taskData;
 
   // Check manager exists and has proper role
-  const managerExists = await UserModel.findOne({ _id: managerId, role: 'manager' });
+  const managerExists = await UserModel.findOne({
+    _id: managerId,
+    role: "manager",
+  });
   if (!managerExists) throw new AppError("Manager not found", 404);
 
   if (!Array.isArray(assignedTo) || assignedTo.length === 0) {
@@ -55,8 +58,15 @@ const updateTaskDetails = async (taskId, updateData) => {
   return updatedTask;
 };
 
+const getTaskById = async(id)=>{
+  const task = await TaskModel.findById({_id:id})
+  if (!task) throw new AppError("Task not found", 404);
+  return task
+}
+
 module.exports = {
   createTaskByManager,
   getAssignedTasks,
   updateTaskDetails,
+  getTaskById
 };

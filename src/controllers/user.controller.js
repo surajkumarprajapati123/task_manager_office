@@ -50,7 +50,7 @@ const ForgatePassword = catchAsync(async (req, res) => {
 });
 const ResetPassword = catchAsync(async (req, res) => {
   const token = req.query.token || req.params.token; // works for both
-   await UserService.resetPassword(req.body, token);
+  await UserService.resetPassword(req.body, token);
   ApiResponse(res, 200, "Password changed successfully", null);
 });
 
