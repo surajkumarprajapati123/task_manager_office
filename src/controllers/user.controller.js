@@ -50,16 +50,22 @@ const ForgatePassword = catchAsync(async (req, res) => {
   );
 });
 const ResetPassword = catchAsync(async (req, res) => {
+  const token = req.query.token || req.params.token; // works for both
+  const user = await UserService.resetPassword(req.body, token);
+  ApiResponse(res, 200, "Password changed successfully", null);
+});
+
+const GetProfile = catchAsync(async (req, res) => {
   let user;
-  console.log(req.params)
-  console.log(req.params.token)
-  user = await UserService.resetPassword(req.body, req.params.token);
-  ApiResponse(res, 200, "password is change successfully", null);
+
+  user = await UserService.getProfile(req.user._id);
+  ApiResponse(res, 200, "User Profile is ", user);
 });
 
 module.exports = {
   RegisterUser,
   LoginUser,
   ForgatePassword,
-  ResetPassword
+  ResetPassword,
+  GetProfile
 };

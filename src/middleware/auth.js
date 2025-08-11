@@ -1,7 +1,6 @@
-const { UserModel } = require("../models");
-const { TokenService } = require("../service");
 const jwt = require("jsonwebtoken");
-const ErrorHandler = require("../utils/ErrorHandler");
+const { UserModel } = require("../modles");
+const AppError = require("../utils/AppError");
 
 const Auth = async (req, res, next) => {
   try {
@@ -9,19 +8,18 @@ const Auth = async (req, res, next) => {
       req.cookies?.AccessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
-    // console.log(token);
     if (!token) {
-      throw new ErrorHandler("Unauthorized request", 401);
+      throw new AppError("Unauthorized request", 401);
     }
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     const user = await UserModel.findById(decodedToken?._id).select(
-      "-password"
+      "-password" 
     );
 
     if (!user) {
-      throw new ErrorHandler("Invalid Access Token", 401);
+      throw new AppError("Invalid Access Token", 401);
     }
 
     req.user = user;

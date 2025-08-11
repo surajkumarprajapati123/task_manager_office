@@ -33,6 +33,7 @@ const UserSchema = mongoose.Schema(
       default: "developer",
     },
     resetToken: String,
+    resetPasswordToken:String,
   resetTokenExpiration: Date
    
   },
@@ -40,11 +41,12 @@ const UserSchema = mongoose.Schema(
 );
 
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
+
+
 UserSchema.methods.comparePassword = async function (password) {
   const ismatch = await bcrypt.compare(password, this.password);
   // console.log("Password is from databse  ", ismatch);

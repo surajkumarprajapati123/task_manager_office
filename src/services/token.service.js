@@ -7,7 +7,6 @@ const GenerateAccesssTokenandRefreshToken = async (userid) => {
     if (!user) {
       throw new ErrorHandler("User not found", 401);
     }
-    console.log("user",user)
     const AccessToken = await user.generateAccessToken();
     const RefreshToken = await user.generateRefreshToken();
     

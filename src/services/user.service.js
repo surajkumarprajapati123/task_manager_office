@@ -2,8 +2,8 @@ const { UserModel } = require("../modles");
 const AppError = require("../utils/AppError");
 const randomString = require("randomstring");
 const { SendOnlyEmailForgate } = require("./Email.service");
-const jwt = require("jsonwebtoken")
-const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const RegisterUser = async (userdata) => {
   const { name, email, password, phone } = userdata;
@@ -61,7 +61,6 @@ const Login = async (userData) => {
 
   try {
     user = await UserModel.findOne({ email });
-
     if (!user) {
       throw new AppError("User is not registered", 401);
     }
@@ -115,69 +114,41 @@ const ForgotPassword = async (email) => {
   return { message: "Reset token generated and sent successfully" };
 };
 
+// In resetPassword.js
 const resetPassword = async (passwordData, token) => {
-  try {
-    // Check if token is provided
-    console.log("token is ",token)
-    if (!token) {
-      throw new AppError("Please provide a token", 401);
-    }
+  if (!token) throw new AppError("Please provide a token", 401);
 
-    // Extract password from passwordData
-    const { password } = passwordData;
-    if (!password) {
-      throw new AppError("Enter the Password", 401);
-    }
+  const { password } = passwordData;
+  if (!password) throw new AppError("Enter the Password", 401);
 
-    // Find token in database
-    // const decodedToken = await TokenModel.findOne({ token });
-    // if (!decodedToken) {
-    //   throw new AppError("Token is invalid", 401);
-    // }
+  const user = await UserModel.findOne({ resetToken: token });
+  if (!user) throw new AppError("Invalid or expired token", 400);
 
-    // // Log current time and decoded token time
-    // // console.log("Current time: ", new Date());
-    // // console.log("Token expiry time: ", new Date(decodedToken.expires));
+  // Just set the new password; let pre-save hook hash it
+  user.password = password;
+  user.resetToken = undefined;
+  await user.save();
 
-    // // Check if token has expired
-    // if (Date.now() > decodedToken.expires) {
-    //   decodedToken.blacklisted = true;
-    //   await decodedToken.save();
-    //   throw new AppError(
-    //     "Token has expired, please request a new one",
-    //     401
-    //   );
-    // }
-
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Update user's password
-    const userId = decodedToken.user;
-    const user = await UserModel.findByIdAndUpdate(userId, {
-      password: hashedPassword,
-    });
-
-    // Check if user exists
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    // Return the updated user
-    return user;
-  } catch (error) {
-    // Handle errors
-    if (error instanceof jwt.JsonWebTokenError) {
-      throw new AppError("Invalid token", 401);
-    }
-    throw error; // Re-throw other errors
-  }
+  return user;
 };
 
+const getProfile = async (userid) => {
+  const user = await UserModel.findById({ _id: userid }).select(
+    "-password -_id -__v -resetToken -resetPasswordToken -resetTokenExpiration "
+  );
+
+  if (user.role == "admin") {
+    throw new ErrorHandler("You can't senn this profile", 401);
+  }
+  if (!user) {
+    throw new ErrorHandler("User Not found", 401);
+  }
+  return user;
+};
 module.exports = {
   RegisterUser,
   Login,
   ForgotPassword,
   resetPassword,
-
+  getProfile,
 };
