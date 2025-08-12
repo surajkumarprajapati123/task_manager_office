@@ -3,7 +3,7 @@ const ApiResponse = require("../utils/ApiResponse");
 const catchAsync = require("../utils/CatchAsyn");
 
 const CreateTaskByManager = catchAsync(async (req, res) => {
-  let manager = await ManagerService.createTaskByManager(req.body, req.manager._id);
+  let manager = await ManagerService.createTaskByManager(req.body, req.user._id);
   ApiResponse(res, 201, `Task  is created Successfully !`, manager);
 });
 

@@ -9,6 +9,7 @@ const createTaskByManager = async (taskData, managerId) => {
     _id: managerId,
     role: "manager",
   });
+  console.log("managerExists",managerExists)
   if (!managerExists) throw new AppError("Manager not found", 404);
 
   if (!Array.isArray(assignedTo) || assignedTo.length === 0) {
